@@ -1,0 +1,8 @@
+<div *ngFor="let reserva of reservas">
+  <ul class="list-group">
+    <li class="list-group-item">
+      Cabina: {{ reserva.meta.reserva.des.cabina }} -
+      {{ reserva.start.toLocaleString() }} => {{ reserva.end.toLocaleString() }}
+    </li>
+  </ul>
+</div>

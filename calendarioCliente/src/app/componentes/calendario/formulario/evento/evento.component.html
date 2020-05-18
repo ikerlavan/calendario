@@ -1,0 +1,222 @@
+<div class="modal-header">
+  <h5 class="modal-title capitalize">{{ modalData.action }} action occurred</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form [formGroup]="myForm" (ngSubmit)="onSubmit()" novalidate>
+  <div formGroupName="datosReserva" class="modal-body">
+    <!-- EXTENSIÓN -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="3">
+          Extensión
+          <input
+            type="text"
+            formControlName="extension"
+            class="form-control"
+            (keyup)="refresh.next()"
+            placeholder="Extensión"
+          />
+        </label>
+        <div
+          class="error"
+          *ngIf="myForm.get('extension').hasError('pattern')"
+          class="alert alert-danger"
+        >
+          <!-- myForm.get('extension').touched &&  -->
+          Extension shall be 3 numbers
+        </div>
+        <div
+          class="error"
+          *ngIf="myForm.get('extension').hasError('required')"
+          class="alert alert-danger"
+        >
+          <!-- myForm.get('extension').touched &&  -->
+          Extension required
+        </div>
+      </div>
+
+      <!-- NOMBRE -->
+      <div class="form-group col-md-6">
+        <label for="usuario">
+          Nombre
+          <input
+            type="text"
+            formControlName="usuario"
+            class="form-control"
+            placeholder="Tu nombre"
+          />
+        </label>
+        <div
+          class="error"
+          *ngIf="
+            myForm.get('usuario').touched &&
+            myForm.get('usuario').hasError('required')
+          "
+        >
+          usuario is required
+        </div>
+      </div>
+    </div>
+
+    <!-- DEGUB -->
+    <input type="hidden" formControlName="_id" class="form-control" />
+    <input type="hidden" formControlName="_calendarId" class="form-control" />
+    <input type="hidden" formControlName="title" class="form-control" />
+    <input
+      type="hidden"
+      formControlName="action"
+      readonly
+      (change)="refresh.next()"
+      class="form-control"
+    />
+
+    <!-- COLORES -->
+    <input
+      type="hidden"
+      formControlName="primary"
+      (change)="refresh.next()"
+      class="form-control"
+    />
+    <input
+      type="hidden"
+      formControlName="secondary"
+      (change)="refresh.next()"
+      class="form-control"
+    />
+
+    <!-- GRUPO -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="grupo">
+          Grupo al que perteneces
+          <!-- <select type="text" formControlName="action" readonly [(ngModel)]="modalData.action" (change)="refresh.next()" class="form-control" /> -->
+          <!-- (change)="changeRoom($event.target)" -->
+          <select class="custom-select" formControlName="grupo">
+            <option value="" disabled>A qué grupo perteneces</option>
+            <option value="{{ room }}" *ngFor="let room of datos.grupos">{{
+              room
+            }}</option>
+          </select>
+        </label>
+      </div>
+      <!--  -->
+      <div formGroupName="camposReserva">
+        <!-- CABINA -->
+        <div class="form-group col-md-6">
+          <label for="cabina">
+            Nº cabina
+            <select
+              class="custom-select"
+              formControlName="cabina"
+              (change)="addColor($event.target)"
+            >
+              <option value="" disabled>Cabina que quieras reservar</option>
+              <option
+                value="{{ cabina }}"
+                *ngFor="let cabina of datos.cabinas"
+                >{{ cabina }}</option
+              >
+            </select>
+          </label>
+          <!-- <div
+          class="error"
+          *ngIf="myForm.hasError('cabina')"
+          class="alert alert-danger"
+        >
+          Cabina ocupada
+        </div> -->
+        </div>
+      </div>
+
+      <!-- FECHAS -->
+      <div formGroupName="camposReserva">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="start">
+              Fecha inicio
+              <input
+                class="form-control"
+                type="text"
+                formControlName="start"
+                mwlFlatpickr
+                [altInput]="true"
+                [convertModelValue]="true"
+                [enableTime]="true"
+                dateFormat="Y-m-dTH:i"
+                altFormat="F j, Y H:i"
+                placeholder="Not set"
+                (change)="setEnd($event.target)"
+              />
+            </label>
+            <div
+              class="error"
+              *ngIf="
+                myForm.get('start').touched &&
+                myForm.get('end').hasError('fechaInicio')
+              "
+              class="alert alert-danger"
+            >
+              Fecha inicio debe ser mayor que la de fin
+            </div>
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="end">
+              Fecha fin
+              <input
+                class="form-control"
+                type="text"
+                formControlName="end"
+                mwlFlatpickr
+                [altInput]="true"
+                [convertModelValue]="true"
+                [enableTime]="true"
+                dateFormat="Y-m-dTH:i"
+                altFormat="F j, Y H:i"
+                placeholder="Not set"
+              />
+            </label>
+            <div
+              class="error"
+              *ngIf="
+                myForm.get('end').touched &&
+                myForm.get('end').hasError('fechaFin')
+              "
+              class="alert alert-danger"
+            >
+              Fecha fin debe ser mayor que la de inicio
+            </div>
+          </div>
+          <div></div>
+          <div
+            class="error"
+            *ngIf="
+              myForm.get('cabina').hasError('cabina') ||
+              myForm.hasError('cabina')
+            "
+            class="alert alert-danger"
+          >
+            <app-cabinas-ocupadas
+              [reservas]="myForm.get('cabina').reservas"
+            ></app-cabinas-ocupadas>
+            <app-cabinas-ocupadas
+              [reservas]="myForm.errors.reservas"
+            ></app-cabinas-ocupadas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>{{ myForm.errors }}</div>
+  <div class="modal-footer">
+    <button
+      type="submit"
+      [disabled]="myForm.invalid"
+      class="btn btn-outline-secondary"
+    >
+      OK
+    </button>
+  </div>
+</form>

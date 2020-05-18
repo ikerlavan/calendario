@@ -1,0 +1,116 @@
+import {
+  AbstractControl,
+  ValidationErrors,
+  AsyncValidatorFn,
+  ValidatorFn,
+} from '@angular/forms';
+import { Observable, of, timer } from 'rxjs';
+import { debounceTime, take, switchMap, map, delay } from 'rxjs/operators';
+import { EventosService } from 'src/app/servicios/eventos.service';
+import { Criterio } from 'src/app/entidades/criterio';
+import { ReservaCalendar, Reserva } from 'src/app/entidades/reserva';
+import { CalendarEvent } from 'angular-calendar';
+
+export function validarCabina(eventosService: EventosService): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    console.log(control.get('cabina').value);
+    let events: CalendarEvent<{ reserva: Reserva }>[] = [];
+    if (
+      control.get('cabina').value !== '' &&
+      control.get('cabina').value !== 0 &&
+      control.get('start').value !== '' &&
+      control.get('end').value !== ''
+    ) {
+      const criterio: Criterio = {
+        fechaMin: control.get('start').value,
+        fechaMax: control.get('end').value,
+        maxResults: 100,
+        calendarioId: control.get('_calendarId').value,
+        q: 'cabin' + control.get('cabina').value,
+      };
+      const reserva = new ReservaCalendar().getReserva(
+        control.value,
+        null,
+        null
+      );
+
+      eventosService
+        .listarCabinasOcupadas(criterio, reserva)
+        .subscribe((cabinas) => {
+          return (events = cabinas);
+          console.log(cabinas);
+          r();
+          // if (events.length > 0) {
+          //   return { cabina: true, reservas: events };
+          // } else {
+          //   return null;
+          // }
+        });
+
+      if (events.length > 0) {
+        return of({ cabina: true, reservas: events });
+      } else {
+        return null;
+      }
+
+      // return eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
+      //   map((cabinas: CalendarEvent<{ reserva: Reserva }>[]) => {
+      //     console.log('Cabinas');
+      //     if (cabinas.length > 0) {
+      //       return { cabina: true, reservas: cabinas };
+      //     } else {
+      //       return null;
+      //     }
+      //   })
+      // );
+
+      // return eventosService.listarCabinasOcupadas(criterio, reserva).pipe(switchMap((_) =>);
+      // return eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
+      //   map((cabinas) => {
+      //     if (cabinas.length > 0) {
+      //       return { cabina: true, reservas: cabinas };
+      //     } else {
+      //       return null;
+      //     }
+      //   })
+      // );
+
+      // if (events.length > 0) {
+      //   return of({ cabina: true, reservas: events });
+      // } else {
+      //   return of(null);
+      // }
+      // return eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
+      //   map((cabinas) => {
+      //     console.log(cabinas);
+      //     if (cabinas.length > 0) {
+      //       return { cabina: true, reservas: cabinas };
+      //     } else {
+      //       return null;
+      //     }
+      //   })
+      // );
+
+      // return control.valueChanges.pipe(
+      //   debounceTime(500),
+      //   take(1),
+      //   switchMap((_) =>
+      //     eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
+      //       map((cabinas) => {
+      //         console.log(cabinas);
+      //         if (cabinas.length > 0) {
+      //           return { cabina: true, reservas: cabinas };
+      //         } else {
+      //           return null;
+      //         }
+      //       })
+      //     )
+      //   )
+      // );
+    }
+  };
+}
+
+export function r() {
+  console.log('r');
+}
