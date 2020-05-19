@@ -16,11 +16,11 @@ export class Descripcion {
   }
 
   loadClassFromString(cadena: string) {
-    console.log(cadena);
+    // console.log(cadena);
     if (null != cadena && cadena.length > 0 && cadena !== 'descripción') {
       const arr = cadena.split('\n');
-      console.log(arr[0]);
-      console.log(arr[1]);
+      // console.log(arr[0]);
+      // console.log(arr[1]);
       this.grupo = arr[0].split(':')[1].trim();
       this.usuario = arr[1].split(':')[1].trim();
       this.extension = arr[2].split(':')[1].trim();

@@ -5,7 +5,6 @@
   </button>
 </div>
 <form [formGroup]="myForm" (ngSubmit)="onSubmit()" novalidate>
-  <div formGroupName="datosReserva" class="modal-body">
     <!-- EXTENSIÓN -->
     <div class="form-row">
       <div class="form-group col-md-6">
@@ -58,7 +57,7 @@
           usuario is required
         </div>
       </div>
-    </div>
+
 
     <!-- DEGUB -->
     <input type="hidden" formControlName="_id" class="form-control" />
@@ -102,7 +101,7 @@
         </label>
       </div>
       <!--  -->
-      <div formGroupName="camposReserva">
+
         <!-- CABINA -->
         <div class="form-group col-md-6">
           <label for="cabina">
@@ -131,7 +130,7 @@
       </div>
 
       <!-- FECHAS -->
-      <div formGroupName="camposReserva">
+
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="start">
@@ -205,9 +204,8 @@
               [reservas]="myForm.errors.reservas"
             ></app-cabinas-ocupadas>
           </div>
-        </div>
+
       </div>
-    </div>
   </div>
   <div>{{ myForm.errors }}</div>
   <div class="modal-footer">

@@ -79,131 +79,73 @@ export class EventoComponent implements OnInit {
     public activeModal: NgbActiveModal,
     private formBuilder: FormBuilder,
     private eventosService: EventosService,
-    private http: HttpClient,
     private reservasValidator: ReservasValidator
   ) {}
 
   ngOnInit(): void {
     this.myForm = this.createForm();
-    // this.myForm.setAsyncValidators(this.reservasValidator.validarCabina());
-    // this.handleValueChanges();
   }
 
   private createForm() {
     const formulario = this.formBuilder.group({
-      datosReserva: this.formBuilder.group({
+
         title: [
-          this.modalData.event.meta.reserva.des.title,
-          Validators.required,
-        ],
-        extension: [
-          this.modalData.event.meta.reserva.des.extension || '',
-          Validators.pattern('[0-9]{3}'),
+          this.modalData.event.meta.reserva.des.title
         ],
         action: this.modalData.action || '',
-        grupo: [
-          this.modalData.event.meta.reserva.des.grupo || '',
-          Validators.required,
-        ],
-        usuario: ['', [Validators.required]],
-        cabina: [
-          this.modalData.event.meta.reserva.des.cabina || '',
-          [Validators.required],
-          // ,
-          // [this.validarCabina.bind(this)],
-        ],
         primary: this.modalData.event.meta.reserva.des.primary || '',
         secondary: this.modalData.event.meta.reserva.des.secondary || '',
         _id: this.modalData.event.meta.reserva.id || '',
         _calendarId: this.modalData.event.meta.reserva.calendarId || '',
-      }),
-      camposReserva: this.formBuilder.group(
-        {
-          end: [
-            this.modalData.action === 'create'
-              ? addMinutes(
-                  this.getDateWithActualTime(this.modalData.event.start),
-                  30
-                )
-              : this.modalData.event.end,
-            [
-              Validators.required,
-              // ,
-              // this.validarFechaFin.bind(this.myForm.get('start').value),
-            ],
-            // ,
-            // [this.validarCabina.bind(this)],
-          ],
-          start: [
-            this.modalData.action === 'create'
-              ? this.getDateWithActualTime(this.modalData.event.start)
-              : this.modalData.event.start,
-            [
-              Validators.required,
-              // , this.validarFechaInicio
-            ],
-            // ,
-            // [this.validarCabina.bind(this)],
-          ],
-        },
+
+        extension: [
+          this.modalData.event.meta.reserva.des.extension || '',
+          Validators.pattern('[0-9]{3}'),
+        ],
+
+        usuario: [this.modalData.event.meta.reserva.des.usuario || '', [Validators.required]],
+
+        grupo: [
+          this.modalData.event.meta.reserva.des.grupo || '',
+          Validators.required,
+        ],
+
+        cabina: [
+          this.modalData.event.meta.reserva.des.cabina || '',
+          [Validators.required],
+        ],
+
+        end: [
+          this.modalData.action === 'create'
+            ? addMinutes(
+                this.getDateWithActualTime(this.modalData.event.start),
+                30
+              )
+            : this.modalData.event.end,
+          [Validators.required]
+        ],
+
+        start: [
+          this.modalData.action === 'create'
+            ? this.getDateWithActualTime(this.modalData.event.start)
+            : this.modalData.event.start,
+          [Validators.required]
+        ],
+        }/*,
         {
           validators: [
             this.validarFechas,
             this.events[0] ? { cabina: true, reservas: this.events } : null,
           ],
           asyncValidators: this.validateBusiness.bind(this),
-        }
-      ),
-    });
+        }*/
 
-    // this.setValueToForm(formulario);
-    // formulario.setAsyncValidators(this.reservasValidator.validarCabina());
+    );
+
     return formulario;
   }
 
-  private setValueToForm(formulario: AbstractControl) {
-    for (const campo in formulario.value) {
-      if (campo === 'start' || campo === 'end') {
-        return this.setDateTimeByField(campo, formulario);
-      } else {
-        return formulario.get(campo).setValue(this.modalData.event[campo]);
-      }
-    }
-  }
 
-  private setDateTimeByField(campo: string, formulario: AbstractControl): void {
-    if (this.modalData.action === 'create') {
-      if (campo === 'start') {
-        this.setStartDateTime(campo, formulario);
-      } else {
-        this.setEndDateTime(campo, formulario);
-      }
-    } else {
-      formulario
-        .get(campo)
-        .setValue(this.modalData.event[campo], { emitEvent: true });
-    }
-
-    if (campo === 'start') {
-      this.startF = this.modalData.event.meta.reserva.des[campo];
-    } else {
-      this.endF = this.modalData.event.meta.reserva.des[campo];
-    }
-  }
-
-  private setStartDateTime(campo: string, formulario: AbstractControl): void {
-    formulario
-      .get(campo)
-      .setValue(this.getDateWithActualTime(this.modalData.event[campo]));
-  }
-
-  private setEndDateTime(campo: string, formulario: AbstractControl): void {
-    formulario
-      .get(campo)
-      .setValue(
-        addMinutes(this.getDateWithActualTime(this.modalData.event[campo]), 30)
-      );
-  }
 
   private getDateWithActualTime(date: Date): Date {
     const h: Date = new Date();
@@ -293,24 +235,6 @@ export class EventoComponent implements OnInit {
     this.activeModal.close(this.myForm.value);
   }
 
-  // private validarUsuario(control: AbstractControl): any {
-  //   const usuario = control.value;
-  //   let error = null;
-  //   if (usuario.includes('$')) {
-  //     error = { ...error, dollar: 'needs a dollar symbol' };
-  //   }
-  //   return error;
-  // }
-
-  // private validarFechaInicio(control: AbstractControl): any {
-  //   const fechaInicio = control.value;
-  //   let error = null;
-  //   if (fechaInicio !== '' && fechaInicio >= control.parent.get('end').value) {
-  //     error = { ...error, fechaInicio: true };
-  //   }
-  //   return error;
-  // }
-
   validarFechas(group: FormGroup): ValidationErrors | null {
     const fechaFin = group.get('end').value;
     const fechaInicio = group.get('start').value;
@@ -353,7 +277,7 @@ export class EventoComponent implements OnInit {
     );
   }
 
-  validarCabina(control: AbstractControl): Observable<ValidationErrors | null> {
+  private validarCabina(control: AbstractControl): Observable<ValidationErrors | null> {
     // return (control: AbstractControl): ValidationErrors | null => {
     console.log(this.myForm);
     console.log(control);
@@ -382,213 +306,8 @@ export class EventoComponent implements OnInit {
 
       console.log('Antes de llamar');
 
-      // this.http
-      //   .get('https://jsonplaceholder.typicode.com/users', {
-      //     params: { username: 'Bret' },
-      //   })
-      //   .toPromise()
-      //   .then((user: any[]) => (user[0] ? { exists: { user } } : null));
-
-      // this.http
-      //   .get('https://jsonplaceholder.typicode.com/users', {
-      //     params: { username: 'Bret' },
-      //   })
-      //   .pipe(
-      //     map((user: any[]) =>
-      //       user[0] ? { cabina: true, reservas: user } : null
-      //     )
-      //   );
-      // return new Promise((resolve, reject) => {
-
-      // return control.valueChanges.pipe(
-      //   debounceTime(500),
-      //   take(1),
-      //   switchMap((_) =>
-      //     this.eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
-      //       map((data: any[]) => {
-      //         if (data[0]) {
-      //           return of({ cabina: true, reservas: data });
-      //         } else {
-      //           return of(null);
-      //         }
-      //       })
-      //     )
-      //   )
-      // );
-      // debugger;
       this.fillEvents(criterio, reserva);
 
-      // if (this.events[0]) {
-      //   return { cabina: true, reservas: this.events };
-      // } else {
-      //   return null;
-      // }
-      // control.valueChanges.subscribe(() =>
-      //   this.http
-      //     .post(
-      //       ConfiguracionUtil.url +
-      //         ConfiguracionUtil.eventos +
-      //         '?criterio=' +
-      //         JSON.stringify(criterio),
-      //       reserva
-      //     )
-      //     .pipe(
-      //       map((data: any[]) =>
-      //         data[0] ? { cabina: true, reservas: data } : null
-      //       )
-      //     )
-      // );
-
-      // this.http
-      //   .post(
-      //     ConfiguracionUtil.url +
-      //       ConfiguracionUtil.eventos +
-      //       '?criterio=' +
-      //       JSON.stringify(criterio),
-      //     reserva
-      //   )
-      //   .pipe(
-      //     map((data: any[]) =>
-      //       return of(data[0] ? { cabina: true, reservas: data } : null)
-      //     )
-      //   );
-
-      // this.http
-      //   .post(
-      //     ConfiguracionUtil.url +
-      //       ConfiguracionUtil.eventos +
-      //       '?criterio=' +
-      //       JSON.stringify(criterio),
-      //     reserva
-      //   )
-      //   .toPromise()
-      //   .then((cabinas) => {
-      //     if (cabinas[0]) {
-      //       return { cabina: true, reservas: cabinas };
-      //     } else {
-      //       return null;
-      //     }
-      //   });
-
-      // });
-
-      // return (
-      //   this.http
-      //     .post(
-      //       ConfiguracionUtil.url +
-      //         ConfiguracionUtil.eventos +
-      //         '?criterio=' +
-      //         JSON.stringify(criterio),
-      //       reserva
-      //     )
-      //     // .pipe(
-      //     //   map((cabinas: any[]) => {
-      //     //     console.log(cabinas);
-      //     //     return cabinas.length > 0
-      //     //       ? { cabina: true, reservas: cabinas }
-      //     //       : null;
-      //     //   })
-      //     // );
-      //     .toPromise()
-      //     .then((cabinas: any[]) =>
-      //       cabinas.length > 0 ? { cabina: true, reservas: cabinas } : null
-      //     )
-      // );
-
-      // return control.valueChanges.pipe(
-      //   debounceTime(50),
-      //   take(1),
-      //   switchMap((_) =>
-      //     this.http
-      //       .post(
-      //         ConfiguracionUtil.url +
-      //           ConfiguracionUtil.eventos +
-      //           '?criterio=' +
-      //           JSON.stringify(criterio),
-      //         reserva
-      //       )
-      //       .pipe(
-      //         map((cabinas: any[]) =>
-      //           cabinas.length > 0
-      //             ? { cabina: true, reservas: cabinas }
-      //             : null
-      //         )
-      //       )
-      //   )
-      // );
-
-      // return eventosService
-      //   .listar(criterio)
-      //   .pipe(
-      //     map((user: any[]) => (user[0] ? { exists: { cabina: true } } : null))
-      //   );
-
-      // return eventosService.listar(criterio).pipe(
-      //   map((cabinas) => {
-      //     cabinas.length > 0 ? { cabina: true, reservas: cabinas } : null;
-      //   })
-      // );
-
-      // if (events.length > 0) {
-      //   return of({ cabina: true, reservas: events }).pipe(delay(500));
-      // } else {
-      //   return of(null).pipe(delay(500));
-      // }
-
-      // return eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
-      //   map((cabinas: CalendarEvent<{ reserva: Reserva }>[]) => {
-      //     console.log('Cabinas');
-      //     if (cabinas.length > 0) {
-      //       return { cabina: true, reservas: cabinas };
-      //     } else {
-      //       return null;
-      //     }
-      //   })
-      // );
-
-      // return eventosService.listarCabinasOcupadas(criterio, reserva).pipe(switchMap((_) =>);
-      // return eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
-      //   map((cabinas) => {
-      //     if (cabinas.length > 0) {
-      //       return { cabina: true, reservas: cabinas };
-      //     } else {
-      //       return null;
-      //     }
-      //   })
-      // );
-
-      // if (events.length > 0) {
-      //   return of({ cabina: true, reservas: events });
-      // } else {
-      //   return of(null);
-      // }
-      // return eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
-      //   map((cabinas) => {
-      //     console.log(cabinas);
-      //     if (cabinas.length > 0) {
-      //       return { cabina: true, reservas: cabinas };
-      //     } else {
-      //       return null;
-      //     }
-      //   })
-      // );
-
-      // return control.valueChanges.pipe(
-      //   debounceTime(500),
-      //   take(1),
-      //   switchMap((_) =>
-      //     eventosService.listarCabinasOcupadas(criterio, reserva).pipe(
-      //       map((cabinas) => {
-      //         console.log(cabinas);
-      //         if (cabinas.length > 0) {
-      //           return { cabina: true, reservas: cabinas };
-      //         } else {
-      //           return null;
-      //         }
-      //       })
-      //     )
-      //   )
-      // );
     } else {
       return null;
     }
@@ -598,15 +317,10 @@ export class EventoComponent implements OnInit {
       (data: any[]) => {
         this.events = data;
         return data[0] ? { cabina: true, reservas: data } : null;
-        // if (this.events[0]) {
-        //   this.myForm.setErrors({ cabina: true, reservas: this.events });
-        // } else {
-        //   return null;
-        // }
       },
       (e) => console.error('error', e),
-      () => console.log('CMPLITE')
+      () => console.log('COMPLETE')
     );
   }
-  // }
+
 }

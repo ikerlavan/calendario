@@ -72,7 +72,7 @@ export class ReservaCalendar implements Reserva {
     const descri = new Descripcion();
     descri.loadClassFromObject(evento);
 
-    if (undefined !== evento._id) {
+    if (undefined !== evento._id && evento._id !== '') {
       const reserva = events.filter(
         (e) => e.meta.reserva.id.trim() === evento._id.trim()
       );
